@@ -1,0 +1,13 @@
+\begin{center}
+\begin{tikzpicture}
+\draw (0,0) rectangle (5,1) node [pos=0.5] {10-bit index into page directory};
+\draw (5,0) rectangle (10,1) node [pos=0.5] {10-bit index into page table};
+\draw (10,0) rectangle (16,1) node [pos=0.5] {12-bit offset into a physical page};
+\draw node at (0,1.2) [right] {Bit 31};
+\draw node at (5,1.2) [left] {22};
+\draw node at (5,1.2) [right] {21};
+\draw node at (10,1.2) [left] {12};
+\draw node at (10,1.2) [right] {11};
+\draw node at (16,1.2) [left] {Bit 0};
+\end{tikzpicture}
+\end{center}

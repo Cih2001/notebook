@@ -1,0 +1,118 @@
+
+
+\chapter{RootkitArsenal}
+\section{Real Mode (chapter 3.3)}
+\note[Real mode address space]: Real mode uses 20-bit address space
+\begin{note}[Segmented Memory Model]
+\input{Images/RootKits/SegmentedMemoryModel}
+\end{note}
+
+\begin{note}[Registers in real mode]: (p $\rightarrow$ 65)\\
+\input{Images/RootKits/RegistersInRealMode}
+
+\begin{itemize}
+\item Bit 8 of FLAGS Register (TF Trap Flag): if this bit is set, the processor generates a single-step interrupt after each instruction. Debuggers use this to single-step through a program.
+\item Bit 9 of FLAGS Register (IF Interrupt Enabled Flag): If it is set, then interrupts are enabled.
+\end{itemize}
+\end{note}
+
+\begin{note}[Real-Mode Interrupts]
+\begin{enumerate}
+\item An interrupt is some event that triggers the execution of a special kind type of procedure called an \textit{interrupt service routine (ISR)}, also known as an \textit{interrupt handler}
+\item In real mode, the first kilobyte of memory (address 0x00000 to 0x003FF) is occupied by \textit{interrupt vector table (IVT)}. In protected mode this structure is called \textit{interrupt descriptor table (IDT)}.
+\item The logical address of each ISR in IVT is stored sequentially. like figure \ref{figRootKitRealModeIVT}.
+\input{Images/RootKits/RealModeIVT}
+\item Under MS-DOS, the BIOS handles interrupts 0 through 31, and DOS handles interrupts 32 through 63. the remaining interrupts (64 to 265) are for user-defined interrupts.
+\item There are three types of Interrupts
+\begin{itemize}
+\item Hardware Interrupts (maskable and nonmaskable).
+\item Software Interrupts.
+\item Exceptions (faults, traps and aborts).
+\end{itemize}
+Maskbale hardware interrupts can be disabled by clearing IF\footnote{Interrupt Enabled Flag} like interrupt 8 (system timer). Software interrupts (also known as internal interrupts) are implemented in a program using INT instruction. like:
+\begin{lstlisting} [language={[x86masm]Assembler}]
+mov AH,02H
+mov DL,41H
+int 21H
+\end{lstlisting}
+\end{enumerate}
+\end{note}
+
+\begin{note}[Different jump types: Short, Near and Far]\\
+
+\input{Images/RootKits/tblJumpTypes}
+\end{note}
+
+\section{Protected Mode (P.87)}
+\begin{note}[Dedicated-purpose registers for protected mode]\\
+\input{Images/RootKits/ProtectedModeRegisters}
+\begin{itemize}
+\item Of the six segment registers (CS,DS,ES,FS,GS,SS), the CS register is the only one that cannot be set explicitly. Instead, the CS Register contents must be set implicitly through instructions that transfer program control (JMP,CALL,INT,RET,IRET,SYSENTER,SYSEXIT,etc)
+\end{itemize}
+\end{note}
+
+\begin{note}[Protected-Mode Segmentation]
+\begin{itemize}
+\item Paging is an optional feature but segmentation is mandatory.
+\item There are two types of descriptor tables, GDT \footnote{Global Descriptor Table}  and LDT \footnote{Local Descriptor Table} , GDT is mandatory.
+\remark \normalfont The first entry in GDT is always empty and is referred to as a \textit{null segment descriptor}. A selector that refers to this descriptor in the GDT is called \textit{null selector}.
+\end{itemize}
+\input{Images/RootKits/ProtectedModeSegmentation}\\
+
+The most 13 valuable bits of the Segment Selector are index into GDT. So there can be only $2^{13} = 8192$ entries, and each entry (Segment Descriptor) is 8 byte long so maximum size of GDT is $2^{13} \times 2^{3} = 2^{16}$ in byte which perfectly fits into GDTR size partition.
+
+\input{Images/RootKits/SegmentSelector}
+
+So the the instruction
+\lstinline [language={[x86masm]Assembler}] {mov FS:[30h], 0}
+When Linear Base Address referenced by FS is 0x00100000, is to
+\lstinline [language={[x86masm]Assembler}] {mov [100030h], 0}. Note that in this design, some over allowed Linear Addresses can be generated, for example if Effective Address was 0x20000000 and the Linear Base Address was 0xEFFFFFFF, the result would be greater than 0xFFFFFFFF which is the summit of the 32-bit address space.
+\begin{itemize}
+\item There are two specific instructions to work with GDTR, The LGDT loads a value into GDTR and the SGDT reads the value stored in GDTR.
+\item RPL \footnote{Requested Privilege Level} is stored in Segment Selectors, DPL \footnote{Descriptor Privilege Level} is kept in Segment Descriptors.A Segment with a DPL of 0 is referred to as existing inside of Ring 0. The CPL or \textit{Current Privilege Level} is the value of RPL in the CS and SS Registers.
+\end{itemize}
+\input{Images/RootKits/SegmentDescriptor}
+\end{note}
+
+\begin{note}[Protected-Mode Paging]
+\begin{itemize}
+\item Each page can be 4KB, 2MB or 4MB in size.
+\item If a program references a byte in a page of memory that's currently stored on disk, the processor will generate a \textit{page fault \#PF} exception.
+\item The slot in physical memory which pages will be loaded into is called a \textit{page frame}.
+\item 32-bit linear address under paging
+\input{Images/RootKits/LinearAddressUnderPaging}
+\item The physical address (not the linear address) of the first entry of the \textit{page directory} is stored in control register \textbf{CR3}.
+\item Each PDE \footnote{Page Directory Entry} contains the base physical address (not the linear address) of a secondary array structure known as the \textit{page table}.
+\item Each PTE \footnote{Page Table Entry} contains the physical address of a page of memory.
+\end{itemize}
+\input{Images/RootKits/ProtectedModePaging}
+
+With the described routine of paging, we are restricted to 4GB of memory ($1024 \times 1024 \times 4096 = 4GB$). But with the assistive method of PAE\footnote{Paging with Address Extension} we can extend the limit up to 52 address lines.
+\end{note}
+
+\begin{note}[Paging with Address Extension (PAE)]
+\begin{enumerate}
+\item There is a PAE flag in CR4 which PAE is enabled if that flag is set.
+\item With PAE enabled, the linear address is broken into four parts instead of just three.
+\input{Images/RootKits/LinearAddressUnderPAE}
+\item Paging with PAE maps a 32-bit linear address to a 52-bit physical address. If a particular IA-32 processor has less than 52 address lines, the corresponding higher order bits of each physical address generated will simply set to zero.
+\item Take a look at image on P $\rightarrow$ 97
+\end{enumerate}
+\end{note}
+
+\begin{note}[A Closer Look at the Tables]
+\begin{itemize}
+\item Both the PDE and PTE are 32-bit structures.
+\end{itemize}
+\input{Images/RootKits/PDEandPTE}
+Implicit zeros will be added to each Base Address to turn those into 32-bit addresses.
+\end{note}
+
+\begin{note}[A Closer Look at the Control Registers]
+\begin{enumerate}
+\item If each process is given it's own copy of CR3, as part of its scheduling context, then it would be possible for two process to have the same linear address and yet have that linear address map to a different physical address.
+\item CR0's 16th bit is a WP flag (as in write protection). When the WP is set, supervisor level code is not allowed to write into read-only user level memory pages. Whereas this mechanism facilitates the copy-on-write method of process creation (i.e., forking) traditionally used by UNIX systems, this is dangerous to us because it means that a rootkit might not be able to modify certain system data structures.
+\end{enumerate}
+
+\input{Images/RootKits/ControlRegisters}
+\end{note}

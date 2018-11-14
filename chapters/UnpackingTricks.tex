@@ -1,0 +1,19 @@
+\chapter{Unpacking / Anti-Reverse Tricks}
+\section{Debugger Detection}
+\begin{note}[Process Environment Block (PBE) and Thread Information Block (TIB or TEB)]
+\begin{enumerate}
+\item In windows, the only segmentation register in use is FS which points to TIB.
+\item FS:[0] points to the beginning of SEH \footnote{Structured Error Handling} Chain.
+\item FS:[18] contains the linear address of TIB itself, so it means that the content of FS register is the same with FS:[18] or
+\begin{lstlisting} [language={[x86masm]Assembler}]
+lea eax, FS:[0] == mov eax, dword ptr FS:[18h]
+\end{lstlisting}
+\item FS:[30h] points to the start of PEB structure. So according to previous point, these two instructions are equivalent:
+\begin{lstlisting} [language={[x86masm]Assembler}]
+lea eax, FS:[30h] == mov eax, dword ptr FS:[18h]
+		     mov eax, dword ptr FS:[eax+30h]
+\end{lstlisting}
+\item \textit{(Being Debugged)} If the second byte of PEB is set (byte ptr [FS:[30h]+2]), then the program is being debugged.
+\end{enumerate}
+
+\end{note}

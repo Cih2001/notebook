@@ -1,0 +1,47 @@
+\begin{center}
+\begin{tikzpicture}
+\draw (2,0) rectangle (4,0.5) node [pos=0.5] {CR3};
+\draw[->,line width = 2pt] [out=0] (4,0.25) to [in = -90](5,1) node [label={[align=center]-45:32-bit \\Base \\Physical\\ Address}] {};
+\draw (4,1) rectangle (6,2) node [label={[align=center,xshift=-1.0cm, yshift=-1.1cm]Page\\Directory}] {};
+\draw (4,2) rectangle (6,2.5) node [pos = 0.5] {PDE};
+\draw[->,line width=2pt] (6,2.25) -- (9,2.25) node [label={[align=center,label distance = 0.5cm]-160:32-bit \\Base \\Physical\\ Address}] {};
+\draw (4,2.5) rectangle (6,3);
+
+\draw (0,4) rectangle (2,4.5) node [pos=0.5] {GDTR};
+\draw [->,line width = 2pt] (2,4.25) to (4,4.25);
+\draw (4,4) rectangle (6,5) node [pos=0.5] {GDT};
+\draw (4,5) rectangle (6,5.5) node [pos = 0.5] {Descriptor};
+\draw [->,line width = 2pt,out = 0] (6,5.25) to [in = -90] (7,5.95);
+\draw (4,5.5) rectangle (6,6);
+
+\draw (0,5.5) rectangle (2,6) node [pos=0.5] {Selector};
+\draw [->,line width = 2pt,out = 0] (2,5.75) to [in = 180] (4,5.25);
+\draw (0,6.1) rectangle (3,6.6) node [pos=0.5] {Effective Address};
+\draw [->,line width = 2pt] (3,6.35) to (6.6,6.35);
+\draw (7,6.35) circle (0.4) node {\Huge +};
+\draw [->,line width = 2pt] (7.4,6.35) to (8,6.35);
+
+\draw (8,6.1) node [below right] {31} rectangle (9.5,6.6) node [above left] {22};
+\draw [->,line width = 2pt] (8.75,6.1) to (5,2.5);
+\draw (9.5,6.1) node [below right] {21} rectangle (11,6.6) node [above left] {12};
+\draw [->,line width = 2pt] (10.25,6.1) to (10,3.5);
+\draw (11,6.1) node [below right] {11} rectangle (12.5,6.6) node [above left] {0};
+\draw node at (10.25,7.2) {Linear Address};
+
+\draw (9,2) rectangle (11,3) node [pos=0.5] {Page Table};
+\draw (9,3) rectangle (11,3.5) node [pos = 0.5] {PTE};
+\draw (9,3.5) rectangle (11,4);
+
+\draw (13.5,0) rectangle (15.5,3.5);
+\draw[fill=lightgray] (13.5,3.5) rectangle (15.5,4) node [pos=0.5] {4 KB page};
+\draw (13.5,4) rectangle (15.5,4.5) node [pos=0.5] {Byte};
+\draw[fill=lightgray] (13.5,4.5) rectangle (15.5,5);
+\draw (13.5,4.5) rectangle (15.5,7);
+\draw node at (14.25,7.5) [label={[align=center,xshift=0.3cm,yshift=-0.6cm]Physical \\Address Space}] {};
+
+\draw (12,4.25) circle (0.4) node {\Huge +};
+\draw [->,line width = 2pt] (12,6.1) to (12,4.65);
+\draw [->,line width = 2pt] (12.4,4.25) to (13.5,4.25);
+\draw [->,line width = 2pt, out = 0] (11,3.25) to [in = -90] (12,3.85);
+\end{tikzpicture}
+\end{center}

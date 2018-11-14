@@ -1,0 +1,429 @@
+\chapter{Low Level Programming}
+\section{Assembly Tips \& Tricks}
+\section{C++ Tips \& Tricks}
+\begin{note}[Visual C++ common headers]:\\
+\begin{lstlisting} [language={c++}]
+#include <cstdio>
+#include <iostream> // for cout, cin, printf , ...
+\end{lstlisting}
+\end{note}
+
+\begin{note}[\_\_Line\_\_ ] is a preprocessor command for line number in source code. look at note.\ref{ntInlineAsmMacro}
+\end{note}
+
+\begin{note}[Passing arrays to a function]
+\begin{enumerate}
+	\item Arrays can be very large so passing them as values is inefficient, therefore arrays always passed as an pointer.
+	\item Arrays always passed to function as pointers, so they can be so their place (1st parameter, 2nd or else) does not matter.
+\end{enumerate}
+\begin{lstlisting} [language={c++}]
+int main (void) 
+{
+   double values[] = {1.0, 2.0, 3.0, 4.5};
+   cout << average (values, (sizeof values)/(sizeof values[0]))
+}
+double average (double array[], int count) {...}
+\end{lstlisting}
+\end{note}
+
+\begin{note}[CallByRef (\&) and CallByPointer (*)]
+\begin{lstlisting}[language={c++}]
+void inc10p (int* n) { *n += 10;}
+void inc10r (int& n) { n += 10;}
+void inc10v (int n) { n += 10;}
+int main(int argc, char *argv[])
+{
+   int n = 10;
+   inc10p(&n); cout << n << endl; //prints 20
+   inc10r(n);  cout << n << endl; //prints 30
+   inc10v(n);  cout << n << endl; //prints 30
+   return 0;
+}
+\end{lstlisting}
+\end{note}
+
+\begin{note}[``const'' after a function]
+
+``const'' after a function declaration means that the function is not allowed to change any class members (except ones that are marked mutable). for example
+\begin{lstlisting} [language={c++}]
+class Foo {
+public:
+   int Bar(int Random_Argument) const
+   {
+      _tmp = 3; //Class member changed -- error
+      return Random_Argument * 2;
+   }
+private:
+   int _tmp;
+};
+\end{lstlisting}
+The program wont compile cause Function Bar is defined constant but the value of \_tmp (which is a class member) has changed in it.\\
+
+Consider two class-typed variables:
+\begin{lstlisting} [language={c++}]
+class Boo { ... };
+
+Boo b0;       // mutable object
+const Boo b1; // non-mutable object
+\end{lstlisting}
+Now you are able to call any member function of Boo on b0, but only const-qualified member functions on b1.
+\end{note}
+
+\subsection{lvalues, rvalues, move semantics and operator overriding}
+Every C++ expression is either an lvalue (left or locater value) or an rvalue (right value). An lvalue refers to an object that persists beyond a single expression. You can think of an lvalue as an object that has a name. All variables, including non-modifiable (const) variables, are lvalues. An rvalue is a temporary value that does not persist beyond the expression that uses it. 
+\begin{note}[Some examples of lvaues and rvalues]
+\begin{lstlisting}
+//Incorrect usage:
+//   - y is a reference, can not be assigned to a temporary value
+int& y = 10; 
+//Correct usage:
+int x = 10;
+int& y = x;
+
+// Correct usage: the conditional operator returns an lvalue.
+((i < 3) ? i : j) = 7;
+\end{lstlisting}
+\end{note}
+\begin{note}[Lvalues - Returning a reference]
+\begin{enumerate}
+\item Have u seen a function used in the left side of an assignment before? :D
+\item You can also return an lvalue reference from a function. like \lstinline[columns=fixed]{double& lowest(double a[], const int& len)} - notice to double\&
+\item References as return types are of primary significance in the context of object-oriented programming. they enable you to do things that would be
+impossible without them. (This particularly applies to “operator overloading”)
+\end{enumerate}
+\begin{lstlisting} [language={c++}]
+double& lowest(double values[], const int& length); // Function prototype
+int main(void)
+{
+   double data[] = { 3.0, 10.0, 1.5, 15.0, 2.7, 23.0,
+	4.5, 12.0, 6.8, 13.5, 2.1, 14.0 };
+   int len(_countof(data)); // Number of elements
+
+   lowest(data, len) = 6.9; // Change lowest to 6.9
+   lowest(data, len) = 7.9; // Change lowest to 7.9
+}
+// Function returning a reference
+double& lowest(double a[], const int& len)
+{
+   int j(0); // Index of lowest element
+   for(int i = 1; i < len; i++)
+      if(a[j] > a[i]) // Test for a lower value...
+         j = i; // ...if so update j
+   return a[j]; // Return reference to lowest element
+   /*Remember that arrays are ALWAYS passed to functions as an pointers
+   So a[] is actuall a pointer to data[], this is
+   why that the function return value
+   changes the value of the lowest member of the data array.*/
+}
+\end{lstlisting}
+\end{note}
+
+\begin{note}[Rvalue - Returning a rvalue reference can cause a catastrophe]
+\begin{lstlisting} [language={c++}]
+Beta_ab&&
+Beta::toAB() const {
+return move(Beta_ab(1, 1));
+}
+\end{lstlisting}
+This returns a dangling reference, just like with the lvalue reference case. After the function returns, the temporary object will get destructed. You should return Beta\_ab by value, like the following:
+\begin{lstlisting} [language={c++}]
+Beta_ab
+Beta::toAB() const {
+return Beta_ab(1, 1);
+}
+\end{lstlisting}
+Now, it's properly moving a temporary Beta\_ab object into the return value of the function. If the compiler can, it will avoid the move altogether, by using RVO (return value optimization).
+\end{note}
+
+\begin{note}[An in depth complete example]
+
+In this example, we build the Intvec class which is a dynamically sized vector of integers. We also implement + and = operators.
+\begin{lstlisting} [language={c++}]
+class Intvec
+{
+public:
+   explicit Intvec (size_t num = 0)
+      : m_size(num), m_data(new int[m_size])
+   {
+      for (uint i=0; i < m_size ; i++ ) m_data[i] = 1;
+      log("constructor");
+   }
+
+   ~Intvec ()
+   {
+      log("destructor");
+      if (m_data) {
+         delete[] m_data;
+         m_data = 0;
+      }
+   }
+   
+   void exposure ()
+   {
+      qDebug() << "[" << this << "] m_size: " << m_size;
+      std::cout << "[ " << this << " ] m_data: ";
+      for (uint i=0; i < m_size ; i++ )
+         std::cout << m_data[i];  std::cout << endl;
+   }
+private:
+   size_t m_size;
+   int* m_data;
+   void log(const char* msg)
+   {
+      qDebug() << "[" << this << "] " << msg;
+   }
+};
+\end{lstlisting}
+\textbf{Phase 1: Adding a default copy constructor.}\\
+Constructing an instance of this class from another instance, requires a default copy constructor. for example:
+\begin{lstlisting} [language={c++}]
+Intvec v1(10);
+Intvec v2(v1); // this instance is copy of v1, needs default constructor
+\end{lstlisting}
+\begin{remark} \label{rmkDefaultCopyConstructor}
+	C++ compiler provides default copy constructor same as assignment operator. The default version simply provide a member-by-member copying process, similar to that of the default copy constructor. But it's crucial to remember that for any class that has
+	space for members allocated dynamically, you must implement the assignment operator (same as copy constructor) manually.
+\end{remark}
+The memory needed for m\_data in our class is allocated dynamically, so we cannot use default copy constructor (according to remark.\ref{rmkDefaultCopyConstructor}), But what happens if we use it? disaster will result! Since each object will have a pointer to the same
+m\_data, if it is changed for one object, it’s changed for both. There is also the problem that when one object is destroyed, its destructor will free the memory used for the m\_data, and the other object will be left with a pointer to memory that may now be used for something else.
+\begin{lstlisting} [language={c++}]
+Intvec (const Intvec& v)
+   //Using by reference parameter simply saves the amout of memory needed.
+   : m_size(v.m_size) , m_data(new int[v.m_size])
+   //explicit defination of m_data and m_size 
+{
+   for (uint i=0; i < m_size ; i++ ) m_data[i] = v.m_data[i];
+   log("overrided copy constructor");
+}
+// now without any problem  we have Intvec v2(v1);
+\end{lstlisting}
+\textbf{Phase 2: Adding assignment operator.}\\
+Like copy constructor, we need to override assignment operator with an appropriate (according to remark.\ref{rmkDefaultCopyConstructor}) before being able to use instructions like v2=v1;
+\begin{lstlisting} [language={c++}]
+Intvec& operator=(Intvec& other)
+{
+   log("copy assignment constructor");
+   delete[] m_data; //relese memory for lhs operand
+   m_size = other.m_size;
+   m_data = new int[m_size];
+   for (uint i=0; i < m_size ; i++ )
+      m_data[i] = other.m_data[i];
+   return *this;
+}
+\end{lstlisting}
+An assignment might seem very simple, but there’s a couple of subtleties that need further
+investigation. First of all, note that you return a reference from the assignment operator function. It may not be immediately apparent why this is so — after all, the function does complete the assignment operation entirely, and the object on the right of the assignment will be copied to that on the left. Superficially, this would suggest that you don’t need to return anything, but you need to consider in a little more depth how the operator might be used.
+\begin{remark}
+	When implementing assignment operator, we often return a reference to an object instead of object itself.
+\end{remark}
+If the Intvec object itself had been returned instead of a reference to it, insteructions like \verb|(v3 = v2) = v1;| wouldn't have worked correct. This legitimate instruction translates into \verb|(v3.operator=(v2)).operator=(v1);|. In this situation, object returned by \verb|operator=()| is used to call the \verb|operator=()| which is illigal because it's a temporary rvalue. hence the return value should be a reference\\ \\
+\textbf{Phase 3: Adding addition operator.}
+\begin{lstlisting} [language={c++}]
+//returning Intvec& or Intvec&& will result in a dangling reference
+//cause temporary objects are destroyed at the end of function.
+//we also pass rhs by ref cause it's more efficent and takes less memory
+Intvec operator+(const Intvec& rhs)
+{
+   //we want lhs object untouched, so we make a copy of it
+   Intvec tmp(*this);
+   for (uint i=0; i<tmp.m_size; i++)
+      tmp.m_data[i] += rhs.m_data[i];
+   return tmp;
+}
+\end{lstlisting}
+Right now statements like \verb|v2 + v1;| works perfectly but what about \verb|v3 = v2 + v1;|? If we try it, the compiler will complain of \textit{``invalid initialization of non-const reference of type `Intvec\&' from an rvalue of type `Intvec'.''}It's brought about the fact that our assignment operator work by ref (which only accepts lvalues).\\ \\
+\textbf{Phase 4: Handling the problem: Fixing assignment operator}\\
+Here we have two choices, either changing \verb|Intvec& operator=(Intvec& other)| to \verb|Intvec& operator=(Intvec other)| which works faultlessly well, or add another assignment operator which comes below:
+\begin{lstlisting} [language={c++}]
+Intvec& operator=(Intvec&& other)
+{
+   log("copy assignment constructor");
+   delete[] m_data; //relese memory for lhs operand
+   m_size = other.m_size;
+   m_data = new int[m_size];
+   for (uint i=0; i < m_size ; i++ )
+      m_data[i] = other.m_data[i];
+   return *this;
+}
+\end{lstlisting}
+
+\end{note}
+
+\subsection{Templates}
+Templates are a feature of the C++ programming language that allows functions and classes to operate with generic types. This allows a function or class to work on many different data types without being rewritten for each one.
+\begin{note}[Template Functions and Class]\\
+Function Templates are defined like:
+\begin{lstlisting} [language={c++}]
+template <class identifier> function_declaration;
+template <typename identifier> function_declaration;
+\end{lstlisting}
+For example Function Max will return maximum of two given values in different types.
+\begin{lstlisting} [language={c++}]
+template <typename Type>
+Type max(Type a, Type b) {
+   return a > b ? a : b;
+}
+\end{lstlisting}
+The basic syntax for declaring a templated class is as follows:
+\begin{lstlisting} [language={c++}]
+template <class a_type> class a_class {...};
+\end{lstlisting}
+An example of usage are presented below. In this example, multiply function is implemented outside of the class using template functions.
+\begin{lstlisting} [language={c++}]
+template <class A_Type> class calc
+{
+public:
+   A_Type multiply(A_Type x, A_Type y);
+   A_Type add(A_Type x, A_Type y)
+   {
+      return x+y;
+   }
+};
+template <class A_Type> A_Type calc<A_Type>::multiply(A_Type x,A_Type y)
+{
+   return x*y;
+}
+// down there in main
+calc<int> c;
+cout << c.add(2,3);
+\end{lstlisting}
+\end{note}
+
+\begin{note}[Virtual Functions and Abstract Classes (Interfaces)]
+
+An interface describes the behavior or capabilities of a C++ class without committing to a particular implementation of that class. A class is made abstract by declaring at least one of its functions as pure virtual function. A pure virtual function is specified by placing "= 0" in its declaration as follows:
+\begin{lstlisting} [language={c++}]
+template <typename t> class Box
+{
+public:
+   // pure virtual function
+   virtual t getVolume() const = 0;
+protected:
+   t length;      // Length of a box
+   t breadth;     // Breadth of a box
+   t height;      // Height of a box
+};
+\end{lstlisting}
+So each box need have been provided by getVolume method.
+\begin{lstlisting} [language={c++}]
+template <typename t> class NormalBox : public Box<t>
+{
+public:
+   NormalBox (t _x,t _y ,t _z)
+   {
+      this->length = _x; this->breadth = _y; this->height = _z;
+   }
+
+   double getVolume() const
+   {
+      return this->length * this->breadth * this->height;
+   }
+};
+
+template <typename t> class CubicBox : public Box<t>
+{
+public:
+   CubicBox (t _x);
+   t getVolume() const
+   {
+      return this->length * this->length * this->length;
+   }
+};
+//Constructor Definition
+template <typename t> CubicBox<t> :: CubicBox (t _x) 
+{
+   this->length = this->breadth = this->height = _x;
+}
+\end{lstlisting}
+\end{note}
+
+\section{Embedded assembly in C++}
+\begin{note}[Embedding a byte in Code Area]
+
+\begin{lstlisting}[language={c++}]
+__asm{
+  some code
+  jmp after
+  _emit 0x0f
+		
+after:
+  mov eax,eax
+}
+\end{lstlisting}
+\end{note}
+
+\begin{note}[C++ Inline assembly in macros]\label{ntInlineAsmMacro}
+
+Sometimes we want to insert some junk codes, between each line of the program, the best solution is to write a macro to simplify the process instead of inserting the same redundant ASM code frequently. e.g.:
+
+\begin{lstlisting}[language={c++}]
+#define Paste (a,b) a##b
+#define PasteSymbols (a,b) Paste (a,b)
+\end{lstlisting}
+\_\_Line\_\_ wont work properly without two above definitions. So they are required.
+
+\begin{remark}
+Notice that labels usually should be unique in inline assembly to prevent unwanted jumps and incorrect breakdown in control flow. therefore labels have to be defined like below:
+\begin{lstlisting}[language={c++}]
+_asm {PasteSymbols (Label,__LINE__): }
+\end{lstlisting}
+\end{remark}
+Final macro looks like:
+\begin{lstlisting}[language={c++}]
+#define IncDecJmpBetween () \
+	_asm {inc eax};\
+	_asm {jmp PasteSymbols (Label,__LINE__)};\
+	_asm {PasteSymbols (Label,__LINE__):};\
+	_asm {dec eax};
+\end{lstlisting}
+\end{note}
+
+\section{C++ Standard Library}
+\begin{note}[Pair]
+\begin{lstlisting}[language={c++}]
+#include <map>
+#include <string>
+int main(){
+  std::pair<int,std::string> one (1,"One");
+  std::pair<int,std::string> two_and_three[] = { {2,"Two"} , {3,"Three"} };
+  std:cout << "1 is " << one.second << " and 2 is " << two_and_three[0].second;
+}
+\end{lstlisting}
+\end{note}
+\begin{note}[Vector and Iterators]
+\begin{itemize}
+\item vector definition:
+\begin{lstlisting}[language={c++}]
+std::vector<std::string> v = {"This","is"}
+\end{lstlisting}
+\item push and pop:
+\begin{lstlisting}[language={c++}]
+v.push_back("an");
+v.pop_back();
+\end{lstlisting}
+\item remove an item:
+\begin{lstlisting}[language={c++}]
+v.erase(v.begin() + 4); //removes the 4th item
+v.erase(std::remove(v.begin(),v.end(),"is"));
+//This one uses std::remove to remove a time by it's value instead of 
+//it's position. It's called erase-remove idiom.
+\end{lstlisting}
+\item Iterator:
+\begin{lstlisting}[language={c++}]
+std::vector<std::string>::iterator it;
+for (it = v.begin(); it < v.end(); it++)
+  std::cout << *it << std::endl;
+\end{lstlisting}
+\item using auto:
+\begin{lstlisting}[language={c++}]
+for (auto it = v.begin(); it < v.end(); it++)
+  std::cout << *it << std::endl;
+\end{lstlisting}
+\item using foreach:
+\begin{lstlisting}[language={c++}]
+foreach (auto str : v)
+//In Qt, foreach (auto str, v)
+	std::cout << v << std::endl;
+\end{lstlisting}
+\end{itemize}
+\end{note}

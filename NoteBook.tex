@@ -1,0 +1,36 @@
+\documentclass{Style}
+
+\begin{document}
+\normalfont
+\clearpage\thispagestyle{empty}
+\setcounter{page}{0}
+\vspace*{4.5cm}
+\begin{center}
+	\begin{tikzpicture}
+	\foreach \x in {0,10,...,360}
+	\draw [->,line width =2,color={red!70!blue}] (0:0) .. controls (\x + 60:1) .. ( \x :1) .. controls +(\x - 60:1) .. (\x:2) .. controls +(\x+60:1) .. (\x:3) .. controls +(\x - 60:1) .. (\x:4);
+	
+	\draw[-latex,white,postaction={decorate},decoration={text along path,
+		text={HAMIDREZA EBTEHAJ - HAMIDREZA EBTEHAJ - HAMIDREZA EBTEHAJ - HAMIDREZA EBTEHAJ - HAMIDREZA EBTEHAJ - HAMIDREZA EBTEHAJ - Author -},text align=center}]
+	(0:0) circle (4.4);
+	\end{tikzpicture}
+	\begin{equation} 
+	P_n = (n-2\lceil\frac{n}{2}\rceil+1)[\theta:\lceil \frac{n}{2}\rceil] + (2\lceil\frac{n}{2}\rceil-n) \big\{P_{n-1} + [\theta + (-1)^n:\lceil \frac{n}{2}\rceil] \big\} \quad \quad , 0 \leqslant \theta < 2\pi , n \in \mathbb{N}
+	\end{equation}
+\end{center}
+\vspace*{\fill}
+
+\tableofcontents
+
+\input{chapters/latex}
+\input{chapters/Linux}
+\input{chapters/LowLevelProgramming}
+\input{chapters/Python}
+\input{chapters/QT}
+\input{chapters/windows}
+\input{chapters/Go}
+\input{chapters/UnpackingTricks}
+\input{chapters/RootkitArsenal}
+\input{chapters/RootkitArsenal2}
+\input{chapters/etc}
+\end{document}

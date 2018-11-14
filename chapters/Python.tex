@@ -1,0 +1,213 @@
+\chapter{Python}
+
+\begin{note}[Strings, Bytes, Lists, Dictionaries]
+\begin{lstlisting}[language = {python}]
+#Strings
+s = "you" "can" "concat" "strings"
+s = "he"+'l'*2+'o'
+s = "this is a String\n"
+multiline_string = """this is 
+                      a multiline 
+                      string"""
+raw_string = r'c:\windows\blah\blah\blah'
+
+s.capitalize() # "This is a string"
+s.split() # ['this', 'is', 'a', 'string']
+s.find('a') # 8
+
+if 'this' in s:
+   print ("true")
+   
+s.count('is') # 2 - number of non-verlaping substrings
+s[5]   # 'i'
+s[5:]  # 'is a string'
+s[5:7] # 'is'
+s[-3:] # 'ing'
+
+#Bytes
+b = b"i'm a byte stream"
+
+#Lists
+l = []
+l = [1 , 2, 'a' , "aaa"]
+l.append (4.145)
+list("characters") # ['c', 'h', 'a', 'r', 'a', 'c', 't', 'e', 'r', 's']
+
+#Dictionaries
+d = {}
+d = {'alice':'001-4234-234', 'bob':'002-2341-455'}
+d['charls'] = '001-8797-009' #inserts into dictionary
+\end{lstlisting}
+\end{note}
+\begin{note}[Modularity]\\
+	Modules are .py files, while packages are folders containing modules and other packages.
+	\\
+	\\
+In math2.py:
+\begin{lstlisting}[language = {python}]
+class basic_math:
+   def power_two(a):
+      return a*a
+\end{lstlisting}
+In main.py:
+\begin{lstlisting}[language = {python}]
+from math.py import basic_math
+
+print("the power two of 2 is ", basic_math.power_two(2))
+\end{lstlisting}
+\end{note}
+\begin{note}[Distinguishing between module import and module executions]
+\begin{lstlisting}[language = {python}]
+#in math.py
+print(__name__)
+# when imported prints math
+# when executed like python3 math.py
+# prints __main__
+
+import sys
+
+if (__name__ = "__main__"):
+   main(sys.argv[1]) #when executed, run main with first command line argument
+\end{lstlisting}
+\end{note}
+
+\begin{note}[Docstrings]
+\begin{lstlisting}[language = {python}]
+def Power_Two(n):
+    """ Computes the square of a given number
+    
+    Args:
+        n: the number we want to compute it's square
+        
+    Returns:
+        square of given number
+    """
+    return n*n
+\end{lstlisting}
+now we can see the document using help(Power\_Two)
+\end{note}
+\begin{note}[Python has dynamic and strong type system]
+\begin{lstlisting}[language = {python}]
+def add(a, b):
+    return a + b
+#these are all acceptable (because of dynamic)
+add(1,2)
+add("qwe", "rty")
+add(['asd','aaa'],["zxc","wqe"])
+add(1.2,2.3)
+#but this is not (because of strong)
+add("string", 42)
+\end{lstlisting}
+\end{note}
+\begin{note}[Scope]
+\begin{lstlisting}[language = {python}]
+count = 0
+def show_count():
+    print("the count is " , count) #works, cause there is no local count
+    
+def set_count(c)
+    count = c # creates a local var count, and sets it
+    global count = c # sets the value of the global count
+\end{lstlisting}
+\end{note}
+\begin{note}[Tuples]
+\begin{enumerate}
+	\item Tuples are defined with parenthesis() instead of brackets[]
+	\item Tuples are like lists, but with special usages.
+	\item One of the tuple usages are return value of the functions
+\end{enumerate}
+\begin{lstlisting}[language = {python}]
+def minmax(l):
+    return min(l), max(l)
+
+l = [1,23,43,12,43,55,6,34,9]
+minmax(l) # (1, 55)
+lower, upper = minmax(l)
+
+#another usage
+(a,(b,c)) = (1,(2,3))
+# now a = 1, b = 2 and c = 3
+
+if 1 in (1,2,3,4):
+    print ("True")
+\end{lstlisting}
+\end{note}
+\begin{note}[Strings, in more details]
+\begin{lstlisting}[language = {python}]
+len("hamid") # 5
+
+#Join
+s = " ".join(['this','is','a','string'])
+
+#partition
+departure, seperator, arrival = "London:Edinburgh".partition(':')
+departure # 'London'
+
+#format
+"My name is {} and i'm {}".format("hamid",22)
+
+import math
+"Math constants: pi={m.pi}, e={m.e}".format(m=math)
+# 'Math constants: pi=3.141592653589793, e=2.718281828459045'
+\end{lstlisting}
+\end{note}
+\begin{note}[Range]
+\begin{lstlisting}[language = {python}]
+list(range(5)) # [0, 1, 2, 3, 4]
+l=list(range(10,20,2))
+for i in l:
+    print(i,end=' ');
+# 10 12 14 16 18 
+
+for i, v in enumerate(l):
+    "The index is {} and the value is {}".format(i,v)
+    
+# 'The index is 0 and the value is 10'
+# 'The index is 1 and the value is 12'
+# 'The index is 2 and the value is 14'
+# 'The index is 3 and the value is 16'
+# 'The index is 4 and the value is 18'
+\end{lstlisting}
+\end{note}
+
+\begin{note}[Exceptions]\\
+	Different types of exceptions in python are: IndexError, ValueError, TypeError, KeyError, OSError and etc.
+\begin{lstlisting}[language = {python}]
+def convert(s):
+'''Convert to an integer.'''
+   try:
+      x = int(s)
+      print("Conversion succeeded")
+      return x
+   except (ValueError, TypeError, OSError) as e:
+      print("conversion error: {}".format(str(e)))
+   finally:	
+      print("End of Function")
+\end{lstlisting}
+
+\end{note}
+\begin{note}[Comprehensions]\\
+The general form of list comprehensions is: [expr(item) for item in iterable]
+\begin{lstlisting}[language = {python}]
+words = "This is a total useless text".split()
+[len(word) for word in words]
+>>> [4, 2, 1, 5, 7, 4]
+from math import factorial
+[(x,factorial(x)) for x in range(10)]
+>>> [(0, 1), (1, 1), (2, 2), (3, 6), (4, 24), (5, 120), (6, 720),
+     (7, 5040), (8, 40320), (9, 362880)
+    ]
+\end{lstlisting}
+The general form of set comprehensions is: \{expr(item) for item in iterable\}.\\
+It's possible to filter comprehensions using if:
+\begin{lstlisting}[language = {python}]
+def is_prime(x):
+   ...
+   
+#list all the prime numbers less than 100
+[x for x in range(100) if is_prime(x)]
+
+#get list of all digits in a number: for examle [1, 2, 3] for 123
+digits = [int(x) for x in list(str(x))]
+\end{lstlisting}
+\end{note}

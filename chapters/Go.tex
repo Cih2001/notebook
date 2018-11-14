@@ -1,0 +1,898 @@
+% !TeX spellcheck = <none>
+\chapter{Go}
+\section{Golang Fundamentals}
+\begin{note}[Setup]:
+	\begin{enumerate}
+		\item To install go use:\\
+		\verb|sudo apt install go|
+		\item
+		Create a new directory for GO\_PATH and add \\
+		\verb|export GOPATH=GO_PATH|\\
+		\verb|export PATH=$PATH:$GOROOT/bin:$GOPATH/bin|
+		\item
+		Download eclipse from \url{https://www.eclipse.org/downloads/} and install it.
+		\item Go to Help $\rightarrow$ Install new software and add \url{http://goclipse.github.io/releases/}, install everything.
+		\item Go to Window $\rightarrow$ prefrences $\rightarrow$ Go, Set Go root path, which can be found by\\
+		\verb|go env|
+		\item Install gocode, guru and godef:\\
+		\verb|go get github.com/nsf/gocode|\\
+		\verb|go get github.com/rogpeppe/godef|\\
+		\verb|go get golang.org/x/tools/cmd/guru|\\
+		and set the respected paths in tools section.
+	\end{enumerate}
+\end{note}
+\begin{note}[Variables]:
+	\begin{enumerate}
+	\item Variables can be declared like:
+\begin{lstlisting}[language = {Golang}]
+var str string
+var A,B int = 0,1
+C,D,E := 1,false,"string"
+\end{lstlisting}
+	\item Defining Consts:
+\begin{lstlisting}[language = {Golang}]
+const (
+	PI = 3.14
+	message = "Hello"
+	A = iota  //A = 2
+	B = iota  //B = 3
+)
+\end{lstlisting}
+	\item Defining types
+\begin{lstlisting}[language = {Golang}]
+//Redefinition of a type
+type Salutation string
+
+//Structural
+type Salutation {
+	name string
+	greeting string
+}
+
+//usage
+var s Salutation = {"bob" , "hello"}
+var s1 Salutation = { greeting: "hello" , name: "bob"}
+fmt.PrintLn(s.name,s.greeting)
+\end{lstlisting}
+	\end{enumerate}
+\end{note}
+\begin{note}[Functions]:
+	\begin{enumerate}
+		\item Declare functions:
+\begin{lstlisting}[language = {Golang}]
+func CreateMessage (name, greeting) string {
+	return greeting + " " + name
+}
+\end{lstlisting}		
+		\item Return multiple values:
+\begin{lstlisting}[language = {Golang}]
+//Without name:
+func CreateMessage (name, greeting) (string,string) {
+	return greeting + " " + name, "Hey " + name
+}
+//With name:
+func CreateMessage (name, greeting) (message, alternate string) {
+	message = greeting + " " + name
+	alternate = "Hey " + name
+	return
+}
+//Usage:
+msg, alt := CreateMessage("joe" , "Hello")
+\end{lstlisting}
+		\item Variadic functions (functions with countless parameters):
+\begin{lstlisting}[language = {Golang}]
+func print (name String, greeting ...string) {	
+	fmt.Println(len(greeting))
+	fmt.Println(name, greeting[1])	
+}
+\end{lstlisting}
+		\item Function as a type:
+\begin{lstlisting}[language = {Golang}]
+type Salutation struct {
+	name string
+	greeting string	
+}
+func print (salutation Salutation, do func(string) ) {	
+	_, msg := CreateMessage(salutation.name, salutation.greeting)	
+	do(msg)
+}
+func CreateMessage (name,greeting string) (message, alternate string) {
+	message = greeting + " " + name
+	alternate = "Hey " + name
+	return
+}
+type Printer func(string) () // () indicates no return value
+func CreatePrintFunction(ascending_msg string) Printer {
+	return func (message string) {
+		fmt.Println(message + ascending_msg)
+	}
+}
+func main() {
+	var message = Salutation{"joe", "Hello"}
+	print(message, CreatePrintFunction("!!!"))
+}
+\end{lstlisting}	
+	\end{enumerate}
+\end{note}
+\begin{note}[Loops]:\\
+	There are three types of for:
+\begin{enumerate}
+\item A C like for loop:
+\begin{lstlisting}[language = {Golang}]
+for init; conditionl post{}
+//example
+var tmp_string string = "This is an ordinary string"
+for i,j := 0, len(tmp_string); i<j; i,j = i+1, j-1 {
+	fmt.Println(strings.Repeat(" ", i) + tmp_string[i:j])
+}
+\end{lstlisting}	
+\item Like a C While:
+\begin{lstlisting}[language=Golang]
+for condition {}
+//example
+for {
+	//infinite loop
+}
+\end{lstlisting}
+\item On ranges:
+\begin{lstlisting}[language=Golang]
+mymap := map[string] string {
+	"Joe" : "Mr ",
+	"Bob" : "Dr ",
+	"Mary" : "Mrs ",
+	}		
+for key, value := range mymap {
+	fmt.Println(value, key)
+}
+\end{lstlisting}
+\end{enumerate}
+\end{note}
+\begin{note}[Maps]:
+\begin{lstlisting}[language=Golang]
+//how to define maps
+var phone_numbers map[string]string = map[string]string {
+	"Jhon" : "001-1234-123",
+	"jhon" : "001-1234-123",
+	"alice" : "001-1232-432",
+}
+//how to delete keys fron map
+delete(phone_numbers,"Jhon")
+//how to use maps
+for key,val := range phone_numbers {
+	fmt.Printf("%s phone number is %s\n", key, val)
+}
+//check for existance
+if value, exists := phone_numbers["bob"]; exists {
+	fmt.Printf("bob's phone number is %s\n",value)
+} else {
+	fmt.Print("There is no bob on phone book")
+}
+\end{lstlisting}
+\end{note}
+\begin{note}[Slides]:
+\begin{lstlisting}[language=Golang]
+//Defining new slice
+var my_slice []int = make([]int, 3, 5)
+//Initializeing slice
+my_slice = []int {
+	1,2,3,4,5,6,7,8,
+}
+//Appending to slice
+my_slice = append(my_slice,10)
+//Delete from slice
+//... means expand the my_slice
+my_slice = append(my_slice[:1], my_slice[2:]...)
+
+fmt.Println(my_slice)
+\end{lstlisting}
+\end{note}
+\subsection{Methods and Interfaces}
+\begin{note}[Methods]:
+There is no class in Golang, but there still methods can be defined on named types.
+\begin{lstlisting}[language=Golang]
+//Named Type
+type Salutation struct {
+	Name string
+	Greeting string
+}
+//Since methods are only defined on named typed
+//Salutations should be defined if we want to
+//implement methods on slice of Salutation
+type Salutations []Salutation
+//This is a method on Salutation
+func (salutation Salutation) Greet () string {
+	return "Hello " + salutation.Greeting + salutation.Name
+}
+\end{lstlisting}
+\end{note}
+\begin{note}[Values vs pointers]:\\
+Look at this example:
+\begin{lstlisting}[language=Golang]
+func (salutation Salutation) Rename (new_name string) {
+	salutation.Name = new_name
+}
+func main() {
+	salutations := greetings.Salutations {
+		{"Jhon" , "Dr "},
+	}
+	salutations[0].Rename("Hamid")
+}
+\end{lstlisting}
+In this example, our program compiles and runs without an error, but it does not work the way intended, because it actually sends a copy of salutation[0] to rename method. If we want to change the salutation[0] itself, we should have defined Rename method to get a pointer like this:
+\begin{lstlisting}[language=Golang]
+func (salutation *Salutation) Rename (new_name string) {
+	salutation.Name = new_name
+}
+\end{lstlisting}
+\end{note}
+\begin{note}[Interfaces]:\\
+Interfaces are defined like:
+\begin{lstlisting}[language=Golang]
+type IRenamable interface {
+	Rename(new_name string)
+}
+\end{lstlisting}
+But nothing implements them explicitly. Infact any named type that has the methods with the signature defined in interface, implements it. so if you look at the previous note, Salutation implements IRenamable. An example of using interfaces comes below.
+\begin{lstlisting}[language=Golang]
+func RenameToFrog(i greetings.IRenamable) {
+	i.Rename("Frog")
+}
+//How to use
+RenameToFrog(&salutations[0])
+\end{lstlisting}
+Salutation's Rename method, takes a pointer, hence address of salutations[0] should be sent to RenameToFrog function.
+\end{note}
+\begin{note}[Empty interface]:\\
+Any named type can implement an empty interface, therefore it is an equvalent of common type "object" in C\#
+\begin{lstlisting}[language=Golang]
+func PrintType (x interface{}) {
+	switch x.(type) {
+	case int:
+		fmt.Println("It's a integer")
+	case string:
+		fmt.Println("It's a string")
+	}	
+}
+\end{lstlisting}
+\end{note}
+\begin{note}[A sample of using built-in go interfaces]:\\
+	Writer is the interface that wraps the basic Write method. 
+\begin{lstlisting}[language=Golang]
+type Writer interface {
+	Write(p []byte) (n int, err error)
+}
+\end{lstlisting}
+So if we add Write method to our defined named type we can use it in FPrintf function. just something like operator overriding.
+\begin{lstlisting}[language=Golang]
+func (salutation *Salutation) Write(p []byte) (n int, err error) {
+	err = nil
+	var str string = string(p)
+	
+	salutation.Name = str
+	n = len(str)
+	return
+}
+// And this is how we use it
+fmt.Fprintf(&sal, "Name is %s", "hamid")
+\end{lstlisting}
+\end{note}
+\subsection{Concurrency}
+\begin{note}[Concurrency]:\\
+concurrency is a built-in feature in go. we can run any function in golang concurrent by means of "go" keyword. just use it before calling a function. to communicate between different threads go uses channels. we can define a channel with chan keyword.
+\begin{lstlisting}[language=Golang]
+// defineing a channel to pass ints with buffer of size 2
+var com chan int = make(chan int,2)
+\end{lstlisting}
+A good way to share a channel is to pass it by the argument.
+\begin{lstlisting}[language=Golang]
+func generate (c chan int) {
+	rand.Seed(time.Now().UnixNano())
+	int_slice := make([]int,100)
+	for i := 0 ; i< 100; i++ {
+		int_slice[i] = i
+	}
+	for len(int_slice) > 1 {
+		rnd_idx := rand.Intn(len(int_slice)-1);
+		c <- int_slice[rnd_idx]
+		int_slice = append(int_slice[:rnd_idx], int_slice[rnd_idx+1:]...)
+	}
+	close(c)
+}
+func main() {
+	var com chan int = make(chan int,2)
+	//This is how we run a functioin concurrent
+	go generate(com)
+}
+\end{lstlisting}
+We can read channels by for-range until it gets closed.
+\begin{lstlisting}[language=Golang]
+for v := range com {
+	fmt.Println(strings.Repeat("*", v))
+}
+\end{lstlisting}
+\end{note}
+\subsection{Useful strings methods}
+\begin{note}[HasSuffix]: returns a bool and checks for the suffix
+\begin{lstlisting}[language=Golang]
+if strings.HasSuffix(path,".css") {
+	contentType := "text/css"
+}
+\end{lstlisting}
+\end{note}
+\section{Intermediate Go}
+\begin{note}[For]:\\
+	For has continue and break keywords.
+\end{note}
+\begin{note}[Using anonymous structs to unmarshal json]:\\
+\begin{lstlisting}[language=Golang]
+import (
+   "fmt"
+   "encoding/json"	
+)
+func main() {
+   fmt.Println("Hi")
+   jsonData := []byte(`[
+	      {"English" : "Mister", "French" : "Monsiour"},
+	      {"English" : "Doctor", "French" : "Doctour" },
+	      {"English" : "Professor", "French" : "Professeur"}]`)
+   //Aonymous struct definition
+   var data []struct {
+      English string
+      French string
+   } 
+
+   if err := json.Unmarshal(jsonData, &data); err != nil {
+      fmt.Println(err)
+   } else {
+      for _, value := range data {
+         fmt.Println(value.English, value.French)
+      }	
+   }
+}
+\end{lstlisting}
+\end{note}
+\section{Web Development}
+\subsection{Resource Server}
+Resource server is a program that handles client requests. it needs to meet these requirements
+\begin{itemize}
+	\item Listen on a TCP port
+	\item Logic to handle requests
+\end{itemize}
+Must we need to implement resource sercer is in std library of go
+\begin{itemize}
+	\item net/http
+	\begin{enumerate}
+		\item \textbf{http.ListenAndServe:} used to kick off the process, allows server to begin and respond to http requests. blocking function.
+		\item \textbf{http.Handle:} allows a url path to be handled by an object that implements http.Handler interface.
+		\item \textbf{http.HandleFunc:} Another major way to a listener in a specific request path.
+	\end{enumerate}
+\end{itemize}
+\begin{note}[Simple Http Handler]:
+\begin{lstlisting}[language=Golang]
+import (
+	"net/http"	
+)
+func main() {
+	http.HandleFunc("/", func (w http.ResponseWriter, req *http.Request) {
+		w.Write([]byte("<h1>Hello world</h1>"))
+	})
+
+	if err := http.ListenAndServe(":7070", nil); err != nil {
+		panic(err)
+	}
+}
+\end{lstlisting}
+\end{note}
+\begin{note}[Simple Http Handler using Handle method]:\\
+First we need a struct which that Implements http.Handler interface
+\begin{lstlisting}[language=Golang]
+type home_page_handler struct {
+	http.Handler
+}
+func (this *home_page_handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+
+}
+\end{lstlisting}
+Then we will populate the logic to send local files from the path in request.
+\begin{lstlisting}[language=Golang]
+func (this *home_page_handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	path := "public/" + req.URL.Path
+	
+	if data, err := ioutil.ReadFile(path); err != nil {
+		w.WriteHeader(404)
+		w.Write([]byte("404 - " + http.StatusText(404)))
+	} else {
+	var contentType string = ""
+	switch {
+		case strings.HasSuffix(path, ".css"):
+		contentType = "text/css"
+		case strings.HasSuffix(path, ".html"):
+		contentType = "text/html"
+		case strings.HasSuffix(path, ".png"):
+		contentType = "image/png"
+		case strings.HasSuffix(path, ".js"):
+		contentType = "application/javascript"
+		default:
+		contentType = "text/plain"
+	}
+	w.Header().Add("Content-Type", contentType)
+	w.Write(data)
+	}
+}
+\end{lstlisting}
+\end{note}
+\begin{note}[Buffering output stream]:\\
+We should use os and bufio packages. instead of using ioutil, now we use os.Open to open the file. then we use bufio.NewReader to read that file in a buffer and then we use WriteTo method of that bufferd reader to write back the data to ResponseWriter.
+\begin{lstlisting}[language=Golang]
+f := os.Open(path)
+bufferdReader := bufio.NewReader(f)
+bufferdReader.WriteTo(w) // w is ResponseWriter
+\end{lstlisting}
+\end{note}
+\begin{note}[Built-in file server in std library]:\\
+All of the above notes were for demonstration and educational purposes. there is a more efficeint built in file server in std library. Just in a single line of code!
+\begin{lstlisting}[language=Golang]
+http.ListenAndServe(":7070", http.FileServer(http.Dir("public")))
+\end{lstlisting}
+\end{note}
+\subsection{HTML Templates}
+For this subsection we commonly use 3 functions from text/template package
+\begin{itemize}
+	\item \textbf{template.New:} to build a new template.
+	\item \textbf{template.Parse:} to parse the template. it's role is to accept resources and use them in the actual definitions of the template.
+	\item \textbf{template.Execute:} when called, it will evaluate the template and binds the object parameter into it.
+\end{itemize}
+\begin{note}[Simple static template]:
+\begin{lstlisting}[language=Golang]
+const con string = `
+<!DOCTYPE html>
+<html>
+<head><title>Fancy Title</title>
+<body>
+<h1>Hello from Templates.</h1>
+</body>
+</html>
+`
+func main() {	
+	http.HandleFunc("/", func (w http.ResponseWriter, req *http.Request) {
+		w.Header().Add("Content-Type", "text/html")
+		teml, err := template.New("test").Parse(con)
+		if err == nil {
+			teml.Execute(w, nil)
+		} else {
+			panic(err)
+		}
+	})
+	//Listen and serve here.
+}
+\end{lstlisting}
+\end{note}
+\begin{note}[Simple dynamic templates]:\\
+We can build dynamic templates using place holders. \verb|{{.}}| is the notation for place holders. We update template like this:
+\begin{lstlisting}[language=Golang]
+const con string = `
+<!DOCTYPE html>
+<html>
+<head><title>Fancy Title</title>
+<body>
+<h1>Hello from {{.}}</h1>
+</body>
+</html>
+\end{lstlisting}
+And executaion will be like this:
+\begin{lstlisting}[language=Golang]
+teml.Execute(w, req.UserAgent())
+\end{lstlisting}
+\end{note}
+\begin{note}[Dynamic templates with objects]:\\
+We can use an object (struct) as a place holder for a Dynamic template. After the period mark eaither members name and methods can be used. and also struct pipeline can be arbitrary infinite.
+\begin{lstlisting}[language=Golang]
+const doc string = `
+<!DOCTYPE html>
+<html>
+<head><title>Fancy Title</title>
+<body>
+<h1>Hello from {{.Message}}</h1>
+<div>These are the list<div>
+<ul>
+{{.CreateBullets}}
+</ul>
+</body>
+</html>
+`
+func main() {	
+	http.HandleFunc("/", func (w http.ResponseWriter, req *http.Request) {
+		w.Header().Add("Content-Type", "text/html")
+		teml, err := template.New("test").Parse(doc)
+		if err == nil {
+			context := Context { "Dynamic Templates",req }
+			teml.Execute(w, context)
+		} else {
+			panic(err)
+		}
+	})
+
+	http.ListenAndServe(":7071", nil)
+}
+
+type Context struct {
+	Message string
+	req *http.Request
+}
+//To printout http header.
+func (this Context) CreateBullets() string {
+	var result string = ""
+	for key ,vals := range this.req.Header {
+		result += fmt.Sprintf("<li>%s: %s</li>\n", key, vals)
+	}
+	return result
+}
+\end{lstlisting}
+\end{note}
+\begin{note}[Branching logic in templates]:\\
+Logic in templates are written using prefix notation.
+\begin{itemize}
+	\item eq and ne: for equal and not equal
+	\item lt and gt: less than and greater than
+	\item le and ge: less than equal and greater than equal
+\end{itemize}
+\begin{lstlisting}[language=html]
+<h1>Hello from
+{{if eq .Path "/google"}}
+	{{.Message}} 
+{{else}}
+	{{.Path}}
+{{end}}
+ </h1>
+\end{lstlisting}
+\end{note}
+\begin{note}[Iteration logic in templates]:\\
+We can use range here. within the range block, the current range collection is set to the root of the pipeline or simply the period operator refers to it. we can user range-else, were else is called when the collection is empty.
+\begin{lstlisting}[language=html]
+{{range .Headers}}
+	<li>
+		{{.}}
+	</li>
+{{end}}
+\end{lstlisting}
+\end{note}
+\begin{note}[Add manual logic to templates]:\\
+\begin{lstlisting}[language=Golang]
+templates.Funcs(template.FuncMap{
+	"mod": func(i, j int) bool { return i%j == 0 },
+	"and": func(i, j bool) bool { return i && j },
+})
+\end{lstlisting}
+\end{note}
+\begin{note}[Subtemplates]:\\
+Syntax for making sub templates is:
+\begin{lstlisting}[language=Golang]
+{{template "template_name" .Object_To_Send_To_Pipeline}}
+\end{lstlisting}
+after that we should build multiple templates like:
+\begin{lstlisting}[language=Golang]
+templates := template.New("template") //this name is not important.
+templates.New("doc").Parse(doc)
+templates.New("header").Parse(header)
+templates.New("footer").Parse(footer)
+templates.Lookup("doc").Execute(w, Pipeline_Object)
+\end{lstlisting}
+\end{note}
+\section{MVC: View layer}
+\begin{note}[Template Cache]:\\
+We should design Template cache to load templates from template folder and load them into a template, In below comes the final design:
+\begin{lstlisting}[language=Golang]
+func main() {
+	templates := populateTemplates()
+	
+	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+		requestedFile := req.URL.Path[1:]
+		template := templates.Lookup(requestedFile + ".html")
+		
+		if template != nil {
+			template.Execute(w, nil)
+		} else {
+			http.NotFound(w, req)
+		}
+	})
+
+	http.ListenAndServe(":7073", nil)
+}
+
+func populateTemplates() *template.Template {
+	result := template.New("template")
+	
+	basePath := "templates"
+	baseDir,_ := os.Open(basePath)
+	defer baseDir.Close()
+	
+	fileInfos,_ := baseDir.Readdir(-1)
+	var templatesFiles []string
+	for _, fileInfo := range fileInfos {
+	  if !(fileInfo.IsDir()) {
+	    templatesFiles = append(templatesFiles, basePath + "/" 
+		    + fileInfo.Name())
+	  }
+	}
+	result.ParseFiles(templatesFiles...)
+	return result
+}
+\end{lstlisting}
+But as you already know it's not enough, we need a way to handle static resources using bufio.
+\end{note}
+\begin{note}[Handleing static resources]:\\
+\begin{lstlisting}[language=Golang]
+func main() {
+	...
+	http.HandleFunc("/css/",serveResource)
+	http.HandleFunc("/img/",serveResource)
+	http.HandleFunc("/js/",serveResource)
+
+	http.ListenAndServe(":7073", nil)
+}
+func serveResource(w http.ResponseWriter, req *http.Request) {
+	path := "public" + req.URL.Path
+	
+	if file, err := os.Open(path); err == nil {
+		bufferReader := bufio.NewReader(file);
+		
+		switch {
+			case strings.HasSuffix(path, ".css"):
+			w.Header().Add("Content-Type", "text/css")
+			case strings.HasSuffix(path, ".png"):
+			w.Header().Add("Content-Type", "image/png")
+			case strings.HasSuffix(path, ".js"):
+			w.Header().Add("Content-Type", "application/javascript")
+			default:
+			w.Header().Add("Content-Type", "text/plain")
+		}
+		bufferReader.WriteTo(w)
+	} else {
+		w.Write([]byte(err.Error()))
+	}
+}
+\end{lstlisting}
+\end{note}
+\begin{note}[Viewmodels]:\\
+We define a Viewmodel for each view, to serve the data through them.
+\begin{lstlisting}[language=Golang]
+package viewmodels
+
+type Home struct {
+	Title string
+	ActiveMenu string
+}
+
+func GetHome() Home {
+	result := Home {
+		Title: "Limonade Store",
+		ActiveMenu: "home",
+	}
+	return result;
+}
+\end{lstlisting}
+GetHome is just a helper function to use an initialized one.
+\end{note}
+\begin{note}[Viewmodels vs Models]:\\
+View models and their helper functions are just for representing views. so we must difer between them and application model. when we designed the application models, we define some convertors to convert them into view models.
+\end{note}
+\section{MVC: Controller}
+In this section we make a subfolder(package) in src and name it "controllers". then we build a conrtoller for each route in a seprate file, like home.go, product.go and ...
+
+The next step is to cut controllers logic from main.go and paste into them. After moving things around we have:\\In main.go
+\begin{lstlisting}[language=Golang]
+func main() {
+	templates := populateTemplates("templates")
+
+	controllers.Register(templates)
+
+	http.ListenAndServe(":7073", nil)
+}
+\end{lstlisting}
+in controllers/general.go:
+\begin{lstlisting}[language=Golang]
+func Register(templates *template.Template) {
+	//this is from github.com/gorilla/mux
+	router := mux.NewRouter()
+
+	hc := new(homeController)
+	hc.templates = templates
+	http.HandleFunc("/home", hc.get)
+
+	//Parametrized routes from mux package
+	pc := new(productController)
+	pc.templates = templates
+	router.HandleFunc("/product/{id}", pc.get)
+
+	http.Handle("/", router) //needed for mux packages
+
+	http.HandleFunc("/css/",serveResource)
+	http.HandleFunc("/img/",serveResource)
+	http.HandleFunc("/js/",serveResource)
+}
+\end{lstlisting}
+and in controllers/home.go:
+\begin{lstlisting}[language=Golang]
+type homeController struct {
+	templates *template.Template
+}
+
+func (this *homeController) get (w http.ResponseWriter , req *http.Request) {
+	vm := viewmodels.GetHome();
+	w.Header().Add("Content-Type", "text/html")
+	this.templates.ExecuteTemplate(w, "home.html", vm)
+}
+\end{lstlisting}
+\begin{note}[Parametrized route from gorilla]:\\
+First we need to dl the mux package from gorilla framework.
+\verb|go get github.com/gorilla/mux| .Remember to set the GOPATH before dling to the project path. Then we can build a new router, and just like the other controllers we register the route with Handle function. At last we need to set the router as a handle function for root.
+\begin{lstlisting}[language=Golang]
+func Register(templates *template.Template) {
+	//this is from github.com/gorilla/mux
+	router := mux.NewRouter()
+	//Parametrized routes from mux package
+	pc := new(productController)
+	pc.templates = templates
+	router.HandleFunc("/product/{id}", pc.get)
+
+	http.Handle("/", router) //needed for mux packages
+}
+\end{lstlisting}
+In the product controller we can access the id again using mux.Vars:
+\begin{lstlisting}[language=Golang]
+func (this *productController) get (w http.ResponseWriter, req *http.Request) {
+	//req is the request object.
+	vars := mux.Vars(req)
+	strId := vars["id"]
+	product_id, err := strconv.Atoi(strId)
+	//the rest of the function...
+}
+\end{lstlisting}
+\end{note}
+\section{GORM}
+Go object relational mappper
+\begin{note}[Needed packages]:
+\begin{lstlisting}[language=Golang]
+import (
+	"github.com/jinzhu/gorm"
+	_ "github.com/lib/pq" //Postgres engine
+)
+\end{lstlisting}
+\end{note}
+\begin{note}[How to open database]:
+\begin{lstlisting}[language=Golang]
+db, err := gorm.Open("postgres", "user=u password=p dbname=db sslmode=disable")
+if err != nil {
+	log.Fatalln(err)
+}
+defer db.Close()
+\end{lstlisting}
+\end{note}
+\begin{note}[Check the database connection]:
+\begin{lstlisting}[language=Golang]
+dbase := db.DB()
+defer dbase.Close()
+
+err = dbase.Ping()
+if err != nil {
+	log.Fatalln(err)
+}
+\end{lstlisting}
+\end{note}
+\begin{note}[How to drop and create tables]:
+\begin{lstlisting}[language=Golang]
+type Users struct {
+	ID        uint
+	Username  string
+	FirstName string
+	Lastname  string
+}
+db.DropTable(&Users{})
+db.CreateTable(&Users{})
+\end{lstlisting}
+To prevent gorm from using uppercase characters as a table name we can:
+\begin{lstlisting}[language=Golang]
+db.SingularTable(true)
+\end{lstlisting}
+And also to define custom name for our table we can define a method called TableName:
+\begin{lstlisting}[language=Golang]
+func (this User) TableName() string {
+	return "TableName"
+}
+\end{lstlisting}
+\end{note}
+\begin{note}[Gorm Model]:\\
+Inserting gorm.Model into the struct will insert Id, Created\_at, Updated\_at and Deleted\_at automatically.
+\begin{lstlisting}[language=Golang]
+type Users struct {
+	gorm.Model
+	Username  string
+	FirstName string
+	Lastname  string
+}
+\end{lstlisting}	
+\end{note}
+\begin{note}[Defineing schema by use of tags]:
+\begin{lstlisting}[language=Golang]
+type Users struct {
+	Model     gorm.Model `gorm:"embedded"`
+	UserID    int    `gorm:"primary_key"`
+	Username  string `sql:"type:VARCHAR(20);not null"`
+	FirstName string `sql:"size:100;not null" gorm:"column:FirstName"`
+	Lastname  string `sql:"unique;unique_index;not null;DEFAULT:'smith'"`
+	Count     int    `gorm:"AUTO_INCREMENT"`
+	TempField bool   `sql:"-"`
+}
+\end{lstlisting}
+\end{note}
+\begin{note}[How to insert data into table]:
+\begin{lstlisting}[language=Golang]
+var users = Users{
+		FirstName: "Hamidreza",
+		Lastname:  "Ebtehaj",
+		Username:  "Cih2001",
+	},
+}
+for _, user := range users {
+	db.Create(&user)
+}
+\end{lstlisting}
+\end{note}
+\begin{note}[First and last]:
+\begin{lstlisting}[language=Golang]
+u1,u2 := Users{},Users{}
+db.Last(&u1)
+db.First(&u2)
+log.Println("Retrevied data:", u1, u2)
+\end{lstlisting}
+\end{note}
+\begin{note}[Retrieve and update]:
+\begin{lstlisting}[language=Golang]
+u := Users{ID: 2}
+db.Where(&u).First(&u) //Get the user with id=2
+u.Lastname = "EBTEHAJ"
+db.Save(&u)
+\end{lstlisting}
+\end{note}
+\begin{note}[Delete from table]:
+\begin{lstlisting}[language=Golang]
+db.Where(&Users{Lastname: "Ebtehaj"}).Delete(&Users{})
+\end{lstlisting}
+\end{note}
+\begin{note}[Foreign key]:
+\begin{lstlisting}[language=Golang]
+db.Model(&User{}).AddForeignKey("role_id", "roles(id)", "CASCADE", "CASCADE")
+\end{lstlisting}
+\end{note}
+\section{Echo framework}
+\begin{note}[Getting it started]:\\
+\begin{lstlisting}[language=Golang]
+import (
+"github.com/labstack/echo"
+"net/http"
+)
+
+func main() {
+	e := echo.New()
+	e.GET("/", func(c echo.Context) error {
+		return c.String(http.StatusOK, "Hello there!")
+	})
+	e.Start(":1323")
+}
+\end{lstlisting}
+\end{note}
+\begin{note}[Parametrized routes]:\\
+\begin{lstlisting}[language=Golang]
+e.GET("/user/:id", func(c echo.Context) error {
+	return c.String(http.StatusOK, c.Param("id")+" : "+c.QueryParam("name"))
+})
+\end{lstlisting}
+use this to test:\\
+\verb|curl -X GET http://localhost:1323/user/12\?name=hamid|
+\end{note}
+\begin{note}[Static content]:\\
+Server any file from static directory for path /static/*.
+\begin{lstlisting}[language=Golang]
+e.Static("/static", "static")
+\end{lstlisting}
+\end{note}

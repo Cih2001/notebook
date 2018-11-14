@@ -1,0 +1,24 @@
+\chapter{Linux: Tips and tricks}
+\begin{note}[Export permanently]:\\
+Add the export commands to the ~/.bashrc file.\\
+\verb|export GOPATH=/home/hamidreza/workspace|\\
+\verb|export PATH=$PATH:$GOROOT/bin:$GOPATH/bin|
+\end{note}
+\begin{note}[Using curl]:\\
+Json Post request:\\
+\verb|curl \|\\
+\verb|	-X POST \|\\
+\verb|	http://localhost:1323/users \|\\
+\verb|	-H 'Content-Type: application/json' \|\\
+\verb|	-d '{"name":"Joe","email":"joe@labstack"}'|\\\\
+Post request:\\
+\verb|curl \|\\
+\verb|	-X POST \|\\
+\verb|	http://localhost:1323/users \|\\
+\verb|	-d 'name=Joe' \|\\
+\verb|	-d 'email=joe@labstack.com'|\\\\
+Get request: \\
+\verb|curl \|
+\verb|	-X GET \|
+\verb|	http://localhost:1323/users\?name\=Joe\&email\=joe@labstack.com|
+\end{note}

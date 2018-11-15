@@ -1,15 +1,22 @@
-\begin{tabular}{|M{2.5cm}|M{4.5cm}|M{7cm}|N}
-\MyTabHeadings JMP Type & \textbf{\textcolor{white}{Example}} & \textbf{\textcolor{white}{Real Mode Machine Encoding}} &\\[\rowheight] \hline
-\textbf{Short} & JMP SHORT mylabel & 0xEB [signed bytes] &\\ [\rowheight] \hline
-\textbf{Near direct} & JMP NEAR PTR mylabel & 0xE9 [low byte][high byte] &\\ [\rowheight] \hline
-\textbf{Near indirect} & JMP BX & 0xFF 0xE3 &\\ [\rowheight] \hline
-\textbf{Far direct} & JMP DS:[mylabel] & 0xEA [IP low][IP high][CS low][CS high] &\\ [\rowheight] \hline
-\textbf{Far indirect} & JMP DWORD PTR [BX] & 0xFF 0x2F &\\ [\rowheight] \hline
-\MyTabHeadings CALL Type & \textbf{\textcolor{white}{Example}} & \textbf{\textcolor{white}{Real Mode Machine Encoding}} &\\[\rowheight] \hline
-\textbf{Near direct} & CALL mylabel & 0xE8 [low byte][high byte] &\\ [\rowheight] \hline
-\textbf{Near indirect} & CALL BX & 0xFF 0xD3 &\\ [\rowheight] \hline
-\textbf{Far direct} & CALL DS:[mylabel] & 0x9A [IP low][IP high][CS low][CS high] &\\ [\rowheight] \hline
-\textbf{Far indirect} & CALL DWORD PTR [BX] & 0xFF 0x1F &\\ [\rowheight] \hline
-\textbf{Near return} & RET & 0xC3 &\\ [\rowheight] \hline
-\textbf{Far return} & RETF & 0xCB &\\ [\rowheight] \hline
+\begin{table}[!htbp]
+	\makegapedcells
+	\centering
+	\resizebox{\textwidth}{!}{%resizing the whole table
+\begin{tabular}{|c|c|c|}\hline
+ \textbf{\textcolor{blue}{JMP Type}} & \textbf{\textcolor{blue}{Example}} & \textbf{\textcolor{blue}{Real Mode Machine Encoding}}  \\[\rowheight] \hline
+\textbf{Short} & JMP SHORT mylabel & 0xEB [signed bytes]  \\ [\rowheight] \hline
+\textbf{Near direct} & JMP NEAR PTR mylabel & 0xE9 [low byte][high byte]  \\ [\rowheight] \hline
+\textbf{Near indirect} & JMP BX & 0xFF 0xE3  \\ [\rowheight] \hline
+\textbf{Far direct} & JMP DS:[mylabel] & 0xEA [IP low][IP high][CS low][CS high]  \\ [\rowheight] \hline
+\textbf{Far indirect} & JMP DWORD PTR [BX] & 0xFF 0x2F  \\ [\rowheight] \hline
+ \textbf{\textcolor{blue}{CALL Type}} & \textbf{\textcolor{blue}{Example}} & \textbf{\textcolor{blue}{Real Mode Machine Encoding}}  \\[\rowheight] \hline
+\textbf{Near direct} & CALL mylabel & 0xE8 [low byte][high byte]  \\ [\rowheight] \hline
+\textbf{Near indirect} & CALL BX & 0xFF 0xD3  \\ [\rowheight] \hline
+\textbf{Far direct} & CALL DS:[mylabel] & 0x9A [IP low][IP high][CS low][CS high]  \\ [\rowheight] \hline
+\textbf{Far indirect} & CALL DWORD PTR [BX] & 0xFF 0x1F  \\ [\rowheight] \hline
+\textbf{Near return} & RET & 0xC3  \\ [\rowheight] \hline
+\textbf{Far return} & RETF & 0xCB  \\ [\rowheight] \hline
 \end{tabular}
+}
+\caption{Jump and call tables}
+\end{table}

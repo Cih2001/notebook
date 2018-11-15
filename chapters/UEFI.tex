@@ -1,0 +1,31 @@
+\chapter{UEFI, BIOS and platform}
+\begin{note}[Abbreviations]:\\
+	\input{Images/UEFI/tblAbbreviations}
+\end{note}
+
+\section{System Management Mode}
+\begin{note}[General notes]:
+\begin{itemize}
+	\item SMM is a special execution mode of IA-32 architecture that was introduced with i386, chapter 34 of \href{http://www.intel.com/content/www/us/en/processors/architectures-software-developer-manuals.html}{Intel 64 and IA-32 Architectures Software Developer’s Manual}
+	\item Some time ago SMM was used by BIOS developers mostly for power management and legacy devices emulation, for example, PS/2 support (port 60h/64h) for USB keyboard and mouse. Nowadays it's also widely used for firmware and platform security purposes.
+	\item SMM executable code and data lives inside SMRAM and when SMRAM is locked — it can't be accessed by code of operating system or user mode software. System firmware (legacy BIOS or UEFI) copies SMM code into SMRAM and locks it during platform initialization.
+	\item Processor is switching to SMM only trough System Management Interrupt (SMI), it saving current execution context into SMRAM and start executing SMI handler that can exit from SMM and resume execution from saved context using RSM instruction.
+	\item System Management Interrupt has the highest priority and can’t be masked. Most important facts about SMI handler execution environment:
+	\begin{enumerate}
+		\item Similar to 16-bit real address mode with paging disabled.
+		\item CS segment base is SMRAM base, EIP is 8000h.
+		\item Segment limits are set to 4 GBytes, you can switch to protected mode or long mode to access all of the physical memory.
+		\item All I/O ports are available.
+		\item SMM code can read or modify saved execution context.
+		\item SMM code can set it’s own IDT and use software interrupts.
+	\end{enumerate}
+	\item There’s a several ways to generate SMI:
+	\begin{enumerate}
+		\item Ring 0 code can trigger software SMI at any time by writing some byte value to APMC I/O port B2h.
+		\item Internal chipset registers (\verb|SMI_EN|, \verb|GEN_PMCON_1| and others) that accessible via PCI config space allows to enable or disable different kind of hardware SMI sources.
+		\item You can route hardware interrupts into SMM by reconfiguring of advanced programmable interrupt controller (APIC) that integrated into CPU.
+		\item I/O instruction restart CPU feature (chapter 34.12 of IA-32 Architectures Software Developer’s Manual) allows to generate SMI on any I/O port access by \verb|IN| or \verb|OUT| processor instruction.
+	\end{enumerate}
+	\item SMRAM can be located in Compatible Memory Segment (CSEG), High Memory Segment (HSEG) or Top of Memory Segment (TSEG) system memory regions.
+\end{itemize}
+\end{note}

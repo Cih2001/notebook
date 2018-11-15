@@ -18,7 +18,7 @@
 %\usepackage[T1]{fontenc}
 
 %\usepackage{multirow}
-\usepackage{colortbl}
+\usepackage{color, colortbl}
 \usepackage{array}
 \usepackage{hyperref}
 
@@ -32,6 +32,11 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{listings}
+
+\usepackage[table]{xcolor}
+\usepackage{makecell}%To keep spacing of text in tables
+\setcellgapes{4pt}%parameter for the spacing
+
 \usepackage{tikz,ifthen}
 \usetikzlibrary{arrows,shapes,trees,backgrounds,calc,through,decorations.pathreplacing,decorations.text}
 
@@ -59,14 +64,15 @@
 %%%%%%%defineing table style%%%%%%%%
 \newcolumntype{M}[1]{>{\arraybackslash}m{#1}}
 \newcolumntype{N}{@{}m{0pt}@{}}
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
 
 \newcommand{\rowheight}{8pt}
 \newcommand{\rowstyle}[1]{\gdef\currentrowstyle{#1}%
 	#1\ignorespaces
 }
-\newcommand\MyTabHeadings{%
-	\rowcolor{darkgray}\rowstyle{\bfseries\color{white}}}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
 
 \lstset{language=C++,
 	basicstyle=\ttfamily,

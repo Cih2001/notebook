@@ -1,0 +1,16 @@
+
+\begin{table}[h]
+\begin{center}
+	\begin{tabular}{|c|l|l|}\hline
+		\multicolumn{1}{c}{ \bfseries Offset} & \multicolumn{1}{c}{\bfseries Length} & \multicolumn{1}{c}{\bfseries Contents} \\ \hline 
+		0 (0x00) & 16 bytes & Partition type GUID \\ \hline
+		16 (0x10)&	16 bytes&	Unique partition GUID\\ \hline
+		32 (0x20)&	8 bytes&	First LBA (little endian)\\ \hline
+		40 (0x28)&	8 bytes&	Last LBA (inclusive, usually odd)\\ \hline
+		48 (0x30)&	8 bytes&	Attribute flags (e.g. bit 60 denotes read-only)\\ \hline
+		56 (0x38)&	72 bytes&	Partition name (36 UTF-16LE code units)\\ \hline
+	\end{tabular}
+\end{center}
+	\caption{GPT Entries}
+\end{table}
+

@@ -17,7 +17,7 @@
 %\usepackage{tgtermes}
 %\usepackage[T1]{fontenc}
 
-%\usepackage{multirow}
+\usepackage{multirow}
 \usepackage{color, colortbl}
 \usepackage{array}
 \usepackage{hyperref}
@@ -37,8 +37,11 @@
 \usepackage{makecell}%To keep spacing of text in tables
 \setcellgapes{4pt}%parameter for the spacing
 
+\usepackage{tabularx,booktabs} 
+
 \usepackage{tikz,ifthen}
 \usetikzlibrary{arrows,shapes,trees,backgrounds,calc,through,decorations.pathreplacing,decorations.text}
+\usepackage{svg}
 
 \hypersetup{
 	pdfmenubar=false, pdfstartview=FitH, 
@@ -65,6 +68,7 @@
 \newcolumntype{M}[1]{>{\arraybackslash}m{#1}}
 \newcolumntype{N}{@{}m{0pt}@{}}
 \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
 
 \newcommand{\rowheight}{8pt}
 \newcommand{\rowstyle}[1]{\gdef\currentrowstyle{#1}%

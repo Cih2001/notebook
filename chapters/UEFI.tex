@@ -2,6 +2,17 @@
 \begin{note}[Abbreviations]:\\
 	\input{Images/UEFI/tblAbbreviations}
 \end{note}
+\section[GPT]{GPT\protect\footnote{GUID Partition Table}}
+\begin{tabularx}{\textwidth}[t]{p{0.4\textwidth}rN}
+ & \multirow{2}{*}{\includegraphics[scale=0.8]{Images/UEFI/GUIDPartitionTableScheme}} \\ 
+ \begin{itemize}
+ 	\item GUID Partition Table (GPT) is a standard for the layout of the partition table on a physical storage device and it forms a part of the Unified Extensible Firmware Interface (UEFI) standard.
+ 	\item The GUID for an EFI system partition is C12A7328-F81F-11D2-BA4B-00A0C93EC93B
+ 	\item The Partition Entry Array describes partitions, using a minimum size of 128 bytes for each entry block.
+ 	\item Secondary GPT is nothing but a backup for Primary GPT
+ \end{itemize} \\ [11cm]
+\end{tabularx}
+\input{Images/UEFI/tblGPTEntries}
 
 \section{System Management Mode}
 \begin{note}[General notes]:

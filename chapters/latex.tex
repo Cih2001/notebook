@@ -19,7 +19,7 @@ Now mix three parts of last color with two parts of its complement and one part 
 $+ 2 \times$ \tikz \draw[fill=green!40!yellow] (0,0) rectangle (6mm,3mm);
 $+ 1 \times$ \tikz \draw[fill=red] (0,0) rectangle (6mm,3mm);
 $=$ \tikz \draw[fill={rgb:-green!40!yellow,3;green!40!yellow,2;red,1}] (0,0) rectangle (6mm,3mm);
-e.g., \verb|\color{rgb:-green!40!yellow,3;green!40!yellow,2;red,1} |)
+\\ e.g., \verb|\color{rgb:-green!40!yellow,3;green!40!yellow,2;red,1} |)
 \end{note}
 \section{Tikz}
 
@@ -454,16 +454,19 @@ allow upside down]
 \usetikzlibrary{calc,through}
 \begin{tikzpicture}[scale=1.2]
 \coordinate [label=left:$A$] (A) at (0,0);
-\coordinate [label=right:$B$] (B) at (1.25,0.25);
+\coordinate [label=right:$B$] (B) 
+ at (1.25,0.25);
 \draw (A) -- (B);
-\node (D) [draw,circle through=(B),label=left:$D$]
-at (A) {};
-\node (E) [draw,circle through=(A),label=right:$E$]
-at (B) {};
-\coordinate[label=above:$C$] (C) at
-(intersection 1 of D and E);
-\coordinate[label=above:$C'$] (Cp) at
-(intersection 2 of D and E);
+\node (D) 
+ [draw,circle through=(B),label=left:$D$]
+ at (A) {};
+\node (E) 
+ [draw,circle through=(A),label=right:$E$]
+ at (B) {};
+\coordinate[label=above:$C$] (C) 
+ at (intersection 1 of D and E);
+\coordinate[label=above:$C'$] (Cp) 
+ at (intersection 2 of D and E);
 \draw [red] (A) -- (C);
 \draw [red] (B) -- (Cp);
 \end{tikzpicture}
@@ -592,7 +595,8 @@ arc (60:-60:2.5) (60:3cm) arc (60:-60:3cm);
 \draw (0,1.8) rectangle (2,2.3) node [pos=0.5] {AH};
 \draw (2,1.8) rectangle (4,2.3) node [pos=0.5] {AL};
 
-\draw [decorate,decoration={brace,amplitude=10pt,mirror},xshift=1pt,yshift=0pt]
+\draw [decorate,decoration={brace,amplitude=10pt,mirror}
+ ,xshift=1pt,yshift=0pt]
 (4,0) -- (4,2.3) node [black,midway,right,xshift=0.3cm,text width=1.5cm] 
 {General Registers};
 \end{lstlisting}

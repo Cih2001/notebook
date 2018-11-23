@@ -27,7 +27,7 @@ BIOS can reside in one of 3 locations:
 \end{note}
 \begin{note}[Find BIOS boot destination]:
 	
-To programmatically find where your BIOS is configured to boot from, you can view bits 11:10 in the General Control and Status Register (GCS)
+To programmatically find where your BIOS is configured to boot from, you can view bits 11:10 in the General Control and Status Register (GCS). It is located at memory mapped offsets 3410-3413h in the Chipset Configuration Registers and Chipset Configuration Registers are mapped starting at the address held by RCBA\footnote{Root Complex Base Address Register}
 \end{note}
 
 \section{UEFI Firmware Volume}

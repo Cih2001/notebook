@@ -13,7 +13,41 @@
  \end{itemize} \\ [11cm]
 \end{tabularx}
 \input{Images/UEFI/tblGPTEntries}
+\section{BIOS Flash Locations}
+\begin{note}[Where bios is stored]
+BIOS can reside in one of 3 locations:
+\begin{itemize}
+	\item Firmware Hub (FWH) (Old technology)
+	\item SPI Flash (most likely this is the case)
+	\item PCI (intended for debugging or recovering from a corrupted BIOS, not supported anymore on newer hardware)
+\end{itemize}
+\begin{center}
+\includegraphics[scale=0.8]{Images/UEFI/BiosLocations}
+\end{center}
+\end{note}
+\begin{note}[Find BIOS boot destination]:
+	
+To programmatically find where your BIOS is configured to boot from, you can view bits 11:10 in the General Control and Status Register (GCS)
+\end{note}
 
+\section{UEFI Firmware Volume}
+\begin{note}[File types]:
+\begin{lstlisting}[language=C]
+typedef UINT8 EFI_FV_FILETYPE;
+
+#define EFI_FV_FILETYPE_RAW                   0x01
+#define EFI_FV_FILETYPE_FREEFORM              0x02
+#define EFI_FV_FILETYPE_SECURITY_CORE         0x03
+#define EFI_FV_FILETYPE_PEI_CORE              0x04
+#define EFI_FV_FILETYPE_DXE_CORE              0x05
+#define EFI_FV_FILETYPE_PEIM                  0x06
+#define EFI_FV_FILETYPE_DRIVER                0x07
+#define EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER  0x08
+#define EFI_FV_FILETYPE_APPLICATION           0x09
+#define EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE 0x0b
+#define EFI_FV_FILETYPE_FFS_PAD               0xf0
+\end{lstlisting}
+\end{note}
 \section{System Management Mode}
 \begin{note}[General notes]:
 \begin{itemize}

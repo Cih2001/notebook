@@ -1,0 +1,37 @@
+\begin{center}	
+\begin{tikzpicture} [x=0.8cm,y=-0.8cm]
+\tikzmath{
+	\Gap = 0.2;
+}
+\draw (0,0) rectangle (3,1) node [pos=0.5] {Processor};
+\draw (0,2) rectangle (3,10);
+\draw (0 + \Gap,2 + \Gap) rectangle (3 - \Gap, 5.5) node [pos=0.5] {MCH};
+\draw (0 + \Gap,6.5) rectangle (3 - \Gap, 10 - \Gap) node [pos=0.5] {Intel ICH9};
+\draw (0,11) rectangle (3,12);
+\draw (4,2) rectangle (15,4) node [pos=0.5] {System Memory};
+\draw[fill=green!50] (13,2) rectangle (15,4) ;
+
+\draw[fill=green!50] (4,8) rectangle (6,10) node [pos=0.5] {SPI Flash} ;
+
+\foreach \x in {8.4, 8.8, 9.2, 9.6}
+{
+	\draw (6, \x-0.1) rectangle (6+\Gap, \x+0.1);
+	\draw (4-\Gap, \x-0.1) rectangle (4, \x+0.1);
+}
+
+\draw[style = dashed] (6,8) -- (13,4);
+\draw[style = dashed] (6,10) -- (15,4);
+\draw[style = dashed] (15-\Gap, 2) -- (15-\Gap,4);
+
+\draw[<->] (1.5, 1) -- (1.5,2+\Gap);
+\draw[<->] (3 - \Gap,9) -- (4,9);
+\draw[<->] (3 - \Gap,3) -- (4,3) node [above] {{\tiny Channel A}};
+\draw[<->] (1.5, 10 - \Gap) -- (1.5,11) node [pos=0.5] {LPC I/F};
+\draw[<->] (1, 5.5) -- (1,6.5) node [above left] {{\tiny DMI Interface}};
+\draw[<->] (2, 5.5) -- (2,6.5) node [above right] {{\tiny Controller Link}};
+
+\draw[->,color=red,line width =1pt] [out=0] (3,0.5) to [in=90] (15-\Gap,2) node[above right]{0xFFFFFFF0};
+\node [below] at (4,4) {0x00000000};
+\node [below right] at (15,4) {0xFFFFFFFF};
+\end{tikzpicture}
+\end{center}

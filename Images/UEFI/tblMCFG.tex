@@ -1,0 +1,26 @@
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{|c|c|c|c|l|N|}\hline
+		\multicolumn{1}{c}{ \bfseries Offset} & \multicolumn{1}{c}{\bfseries Length} & \multicolumn{3}{c}{\bfseries Description} \\ \hline 
+		0 & 4 & \multicolumn{3}{l}{Table Signature ("MCFG")} &\\ \hline
+		4 & 4 & \multicolumn{3}{l}{Length of table (in bytes)} &\\ \hline
+		8 & 1 & \multicolumn{3}{l}{Revision (1)} &\\ \hline
+		9 & 1 & \multicolumn{3}{l}{Table SignatureChecksum (sum of all bytes in table \& 0xFF = 0)} &\\ \hline
+		10 & 6 & \multicolumn{3}{l}{OEM ID (same meaning as other ACPI tables)} &\\ \hline
+		16 & 6 & \multicolumn{3}{l}{OEM table ID (manufacturer model ID)} &\\ \hline
+		24 & 4 & \multicolumn{3}{l}{OEM Revision (same meaning as other ACPI tables)} &\\ \hline
+		28 & 4 & \multicolumn{3}{l}{Creator ID (same meaning as other ACPI tables)} &\\ \hline
+		32 & 4 & \multicolumn{3}{l}{Creator Revision (same meaning as other ACPI tables)} &\\ \hline
+		36 & 8 & \multicolumn{3}{l}{Reserved} &\\ \hline
+		\multirow{7}{*}{44} & \multirow{7}{*}{16 * n} & \multicolumn{3}{l}{Configuration space base address allocation structures.} &\\ \cline{3-5}
+		&& \bfseries Offset & \bfseries Length & \multicolumn{1}{c}{\bfseries Description} &\\ \cline{3-5}
+		&& 0 & 8 & Base address of enhanced configuration mechanism &\\ \cline{3-5}
+		&& 8 & 2 & PCI Segment Group Number &\\ \cline{3-5}
+		&& 10 & 1 & Start PCI bus number decoded by this host bridge &\\ \cline{3-5}
+		&& 11 & 1 & End PCI bus number decoded by this host bridge &\\ \cline{3-5}
+		&& 12 & 4 & Reserved &\\ \hline
+	\end{tabular}
+	\caption{MCFG Table}
+\end{table}
+

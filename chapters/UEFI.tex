@@ -13,21 +13,90 @@
  \end{itemize} \\ [11cm]
 \end{tabularx}
 \input{Images/UEFI/tblGPTEntries}
+\section{PCI and PCI Express}
+\begin{note}[General notes]:
+\begin{itemize}
+	\item PCI \footnote{Peripheral Component Interconnect} is a local computer bus for attaching hardware devices in a computer.
+	\item Supersedes: ISA, EISA, MCA, VLB, Superseded by: PCI Express (2004)
+	\item Since about 2005, the ISA slot is no longer installed in desktop PCs.
+	\item The PCI Express bus extends the Configuration Space from 256 bytes to 4096 bytes. This extended configuration space *cannot* be accessed using the legacy PCI method (through ports 0xCF8 and 0xCFC)
+\end{itemize}
+\end{note}
+\begin{note}[Configuration Space]:
+	
+The PCI specification provides for totally software driven initialization and configuration of each device (or target) on the PCI Bus via a separate Configuration Address Space. All PCI devices, except host bus bridges, are required to provide 256 bytes of configuration registers for this purpose.
+
+PCI devices are inherently little-endian, meaning all multiple byte fields have the least significant values at the lower addresses. This requires a big-endian processor, such as a Power PC, to perform the proper byte-swapping of data read from or written to the PCI device, including any accesses to the Configuration Address Space.\\
+\end{note}
+\begin{note}[Configuration Space Access Mechanisms]:\\
+\textbf{Configuration Space Access Mechanism \#1}:
+\begin{itemize}
+	\item Two 32-bit I/O locations are used, the first location (0xCF8) is named \verb|CONFIG_ADDRESS|, and the second (0xCFC) is called \verb|CONFIG_DATA|. 
+	\input{Images/UEFI/tblCONFIGADDRESS}
+	\item Python script for translation:
+\begin{lstlisting}[language=Python]
+BITMASK = lambda reg, higher,lower:
+	(reg >> lower) & (2 ** (higher-lower+1) - 1)
+
+def IO_PORT_CONFIG_ADDRESS_COMPONENTS(address):
+	register = BITMASK(address,7,2)
+	function = BITMASK(address,10,8)
+	device   = BITMASK(address,15,11)
+	bus      = BITMASK(address,23,16)
+	reserved = BITMASK(address,30,24)
+	enabled  = BITMASK(address,31,31)
+	if address & 3 != 0 or reserved != 0:
+		print ("Invalid address")
+		return
+	print ("Register: 0x%X Function: 0x%X Device: 0x%X" +
+	       "Bus: 0x%X Enabled: 0x%X" % 
+	       (register, function, device, bus, enabled))
+\end{lstlisting}
+\end{itemize}
+\textbf{Configuration Space Access Mechanism \#2}:
+
+\href{https://wiki.osdev.org/PCI#Configuration_Space_Access_Mechanism_.232}{This} configuration space access mechanism was deprecated in PCI version 2.0. This means it's only likely to exist on hardware from around 1992.\\
+\textbf{Configuration Space Access Mechanism \#3 - Memory Mapped PCI Configuration Space Access}:
+\begin{itemize}
+	\item PCI Express introduced a new way to access PCI configuration space, where it's simply memory mapped and no IO ports are used.
+	\item Systems that do provide the memory mapped access mechanism are also required to support PCI access mechanism \#1 for backward compatibility.
+	\item The enhanced configuration mechanism makes use of memory mapped address space range/s to access PCI configuration space. Put simply, the memory address determines the segment group, bus, device, function and register being accessed. On x86 and x64 platforms, the address of each memory area is determined by the ACPI 'MCFG' table.
+	\item To find 'MCFG', Search the ACPI Root System Descriptor Table(RSDT) or Extended Root System Descriptor Table(XSDT)
+	\item $Physical Address = MMIO Starting Physical Address + ( (Bus - MMIO Starting Bus) << 20 | Device << 15 | Function << 12 )$
+\end{itemize}
+\input{Images/UEFI/tblMCFG}
+\begin{lstlisting}[language=Python]
+def PCI_LIB_ADDRESS_COMPONENTS(address):
+	register = address & 0xfff
+	function = (address >> 12) & 0x7
+	device = (address >> 15) & 0x1f
+	bus = (address >> 20) & 0xff
+	extend = (address >> 28)
+	
+	print ("Register: 0x%X Function: 0x%X " +
+	       "Device: 0x%X Bus: 0x%X Extend: 0x%X" %
+	       (register, function, device, bus, extend))
+\end{lstlisting}
+\end{note}
+
+
 \section{BIOS Flash Locations}
-\begin{note}[Where bios is stored]
+\begin{note}[Where bios is stored]:\\
 BIOS can reside in one of 3 locations:
 \begin{itemize}
 	\item Firmware Hub (FWH) (Old technology)
 	\item SPI Flash (most likely this is the case)
 	\item PCI (intended for debugging or recovering from a corrupted BIOS, not supported anymore on newer hardware)
 \end{itemize}
-\begin{center}
-\includegraphics[scale=0.8]{Images/UEFI/BiosLocations}
-\end{center}
+
 \end{note}
 \begin{note}[Find BIOS boot destination]:
 	
 To programmatically find where your BIOS is configured to boot from, you can view bits 11:10 in the General Control and Status Register (GCS). It is located at memory mapped offsets 3410-3413h in the Chipset Configuration Registers and Chipset Configuration Registers are mapped starting at the address held by RCBA\footnote{Root Complex Base Address Register}
+\end{note}
+
+\begin{note}[SPI Flash]:
+	
 \end{note}
 
 \section{UEFI Firmware Volume}
@@ -47,6 +116,23 @@ typedef UINT8 EFI_FV_FILETYPE;
 #define EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE 0x0b
 #define EFI_FV_FILETYPE_FFS_PAD               0xf0
 \end{lstlisting}
+\end{note}
+\section{Reset Vector}
+\begin{note}[Initial Bootstrap]:
+\begin{itemize}
+	\item EIP (or IP since it’s 16-bit mode) is initialized with (0000)FFF0	– CS:IP = F:FFF0h
+	\item CR0 is 60000010h (likely since Pentium)
+	\item Paging (bit 31) is disabled, Protection Enable (bit 0) is 0
+	\item SPI flash is bootstrapped in top 16 MB memory (0xFF000000 to 0xFFFFFFFF)
+	\item As far as the CPU is concerned, it is fetching instructions from memory but in fact it’s from the SPI flash.
+	\item Bytes is my bios entry point: JMP to UEFI Core Sec Module:
+	\begin{center}
+		\includegraphics[scale=0.8]{Images/UEFI/ResetVector1}
+	\end{center}
+	\item First thing that BIOS does, is to get to Protected Mode.
+	\input{Images/UEFI/picInitialBootstrap}
+\end{itemize}
+
 \end{note}
 \section{System Management Mode}
 \begin{note}[General notes]:

@@ -40,8 +40,8 @@
 \usepackage{tabularx,booktabs} 
 
 \usepackage{tikz,ifthen}
-\usetikzlibrary{arrows,shapes,trees,backgrounds,calc,through,decorations.pathreplacing,decorations.text}
-\usepackage{svg}
+\usetikzlibrary{arrows,shapes,trees,backgrounds,calc,through,decorations.pathreplacing,decorations.text,math}
+
 
 \hypersetup{
 	pdfmenubar=false, pdfstartview=FitH, 

@@ -99,6 +99,21 @@ To programmatically find where your BIOS is configured to boot from, you can vie
 	
 \end{note}
 
+\section[RTC]{RTC\protect\footnote{Real-Time Clock} D31:F0}
+\begin{note}[General notes on RTC]:
+\begin{itemize}
+	\item The Real Time Clock (RTC) module provides a battery backed-up date and time keeping
+	device with two banks of static RAM with 128 bytes each.
+	\item RTC is connected to LPC interface (D31:F0).
+	\item It's data can	be represented in BCD or binary format.
+	\item Access to time and date information is done through the RAM locations.
+	\item The RTC battery-backed RAM supports two 8-byte ranges that can be locked using the configuration space. If the locking bits are set, the corresponding range in the RAM will not be readable or writable.
+	\item The first 14 bytes of the standard bank contain the RTC time and date information along with four registers, A–D, that are used for configuration of the RTC.
+\end{itemize}
+\end{note}
+\begin{note}[RTC I/O Registers\protect\footnote{Intel PCH manual - 12.6 Real Time Clock Registers}]:
+	\input{Images/UEFI/tblRTCRegisters}
+\end{note}
 \section{UEFI Firmware Volume}
 \begin{note}[File types]:
 \begin{lstlisting}[language=C]

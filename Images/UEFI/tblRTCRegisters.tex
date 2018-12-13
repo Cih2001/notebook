@@ -1,0 +1,35 @@
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|l|N|}\hline
+	\multicolumn{1}{c}{ \bfseries I/O Locations} & \multicolumn{1}{c}{ \bfseries If U128E bit = 0} & \multicolumn{1}{c}{ \bfseries Function} &\\ \hline 
+	
+	70h and 74h & Also alias to 72h and 76h & Real-Time Clock (Standard RAM) Index Register&\\ \hline
+	71h and 75h & Also alias to 73h and 77h & Real-Time Clock (Standard RAM) Target Register&\\ \hline
+	72h and 76h &  & Extended RAM Index Register (if enabled) &\\ \hline
+	73h and 77h &  & Extended RAM Target Register (if enabled) &\\ \hline
+\end{tabular}
+\caption{RTC I/O Registers}
+\end{table}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|P{4cm}|L{9cm}|N|}\hline
+	\multicolumn{1}{c}{ \bfseries Index} & \multicolumn{1}{c}{ \bfseries Name} &\\ \hline 
+	00h & Seconds &\\ \hline
+	01h & Seconds Alarm &\\ \hline
+	02h & Minutes &\\ \hline
+	03h & Minutes Alarm &\\ \hline
+	04h & Hours &\\ \hline
+	05h & Hours Alarm &\\ \hline
+	06h & Day of Week &\\ \hline
+	07h & Day of Month &\\ \hline
+	08h & Month &\\ \hline
+	09h & Year &\\ \hline
+	0Ah & Register A &\\ \hline
+	0Bh & Register B &\\ \hline
+	0Ch & Register C &\\ \hline
+	0Dh & Register D &\\ \hline
+	0Eh - 7Fh & 114 Bytes of User RAM &\\ \hline
+\end{tabular}
+\caption{RTC (Standard) RAM Bank}
+\end{table}
